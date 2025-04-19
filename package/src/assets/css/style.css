@@ -1,0 +1,22 @@
+.card {
+    border-radius: 8px;
+    /* Bo góc */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* Tạo bóng mờ */
+    overflow: hidden;
+    /* Ẩn phần thừa */
+}
+
+.card-body {
+    padding: 15px;
+    /* Padding trong card */
+}
+
+.card-title {
+    font-size: 1.1rem;
+    /* Tăng kích thước tiêu đề */
+}
+
+.card-text {
+    font-size: 1rem;
+}

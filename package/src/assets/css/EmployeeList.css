@@ -1,0 +1,83 @@
+.employee-container {
+    max-width: 1500px;
+    margin: auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.employee-container h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed;
+}
+
+.employee-table th,
+.employee-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+.employee-table th {
+    background-color: #4CAF50;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.employee-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.employee-table tr:hover {
+    background-color: #ddd;
+}
+
+.employee-table td img {
+    display: block;
+    margin: auto;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    /* Đặt các nút theo chiều dọc */
+    gap: 10px;
+    width: 100%;
+}
+
+.actions button {
+    padding: 5px 10px;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+.actions .edit-btn {
+    background-color: #007bff;
+}
+
+.actions .edit-btn:hover {
+    background-color: #0056b3;
+}
+
+.actions .delete-btn {
+    background-color: #dc3545;
+}
+
+.actions .delete-btn:hover {
+    background-color: #a71d2a;
+}
