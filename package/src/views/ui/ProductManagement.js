@@ -70,7 +70,7 @@ const ProductManagement = () => {
       <Card>
         <CardTitle tag="h6" className="border-bottom p-3 mb-0">
           <i className="bi fs-3 bi-newspaper me-2"> </i>
-          <span className="fs-3"> Quản lý loại hàng và xuất xứ </span>
+          <span className="fs-3"> Quản lý loại hàng </span>
         </CardTitle>
         <CardBody>
           <div className="mt-3">
@@ -89,7 +89,7 @@ const ProductManagement = () => {
       </Card>
 
 
-      <Card>
+      {/* <Card>
         <CardTitle tag="h6" className="border-bottom p-3 mb-0">
           <i className="bi fs-3 bi-newspaper me-2"> </i>
           <span className="fs-3"> Quản lý xuất xứ </span>
@@ -104,7 +104,7 @@ const ProductManagement = () => {
           <FormOriginUD />
           {activeForm === "addOrigin" && <FormOrigin />}
         </CardBody>
-      </Card>
+      </Card> */}
 
     </div>
   );

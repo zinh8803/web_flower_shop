@@ -16,6 +16,8 @@ import FormOrigin from "../forms/FormOrigin";
 import EmployeeList from "../forms/EmployeeList";
 import FormAddEmployee from "../forms/FormAddNV";
 import DeliveryReceiptPage from "../forms/listgiaohang"
+import FormPositionUD from "../forms/FormPosition";
+import Calendar from "../forms/FormSchedules";
 const Giaohang = () => {
   const [cSelected, setCSelected] = useState("");
   const [categories, setCategories] = useState([]);
@@ -27,22 +29,55 @@ const Giaohang = () => {
     setCSelected(event.target.value);
   };
 
- 
+
 
   return (
     <div>
       <Card>
         <CardTitle tag="h6" className="border-bottom p-3 mb-0">
           <i className="bi fs-3 bi-newspaper me-2"> </i>
-          <span className="fs-3"> Quản lý giao hàng</span>
+          <span className="fs-3"> Quản lý chức vụ và lịch trình</span>
         </CardTitle>
         <CardBody>
           <div className="mt-3">
-          
+
           </div>
 
-          
-          <DeliveryReceiptPage />
+          <Card>
+            <CardTitle tag="h6" className="border-bottom p-3 mb-0">
+              <i className="bi fs-3 bi-newspaper me-2"> </i>
+              <span className="fs-3"> Quản lý chức vụ </span>
+            </CardTitle>
+            <CardBody>
+              <Button
+                className="btn btn-info ms-5"
+                onClick={() => setActiveForm(activeForm === "addOrigin" ? "" : "addOrigin")}>
+                {activeForm === "addOrigin" ? "Đóng Form Thêm Xuất Xứ" : "Thêm xuất xứ"}
+              </Button>
+
+              <FormPositionUD />
+              {activeForm === "addOrigin" && <FormOrigin />}
+            </CardBody>
+          </Card>
+
+
+
+          <Card>
+            <CardTitle tag="h6" className="border-bottom p-3 mb-0">
+              <i className="bi fs-3 bi-newspaper me-2"> </i>
+              <span className="fs-3"> Quản lý lịch trình </span>
+            </CardTitle>
+            <CardBody>
+              <Button
+                className="btn btn-info ms-5"
+                onClick={() => setActiveForm(activeForm === "addOrigin" ? "" : "addOrigin")}>
+                {activeForm === "addOrigin" ? "Đóng Form Thêm Xuất Xứ" : "Thêm xuất xứ"}
+              </Button>
+
+              <Calendar />
+              {activeForm === "addOrigin" && <FormOrigin />}
+            </CardBody>
+          </Card>
         </CardBody>
       </Card>
 

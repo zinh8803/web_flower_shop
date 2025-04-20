@@ -38,10 +38,10 @@ const Orderlist = () => {
     const fetchInitialData = async () => {
       try {
         const [ordersRes, employeesRes] = await Promise.all([
-          axios.get("http://localhost:7000/api/DonHang"),
-          axios.get("http://localhost:7000/api/NhanVien"),
+          axios.get("http://127.0.0.1:8000/api/Order"),
+          //axios.get("http://localhost:7000/api/NhanVien"),
         ]);
-        setOrders(ordersRes.data || []);
+        setOrders(ordersRes.data.data || []);
         setEmployees(employeesRes.data || []);
       } catch (error) {
         console.error("Error fetching initial data:", error);
@@ -74,7 +74,7 @@ const Orderlist = () => {
       );
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order.idDonHang === idDonHang ? { ...order, trangThai: status } : order
+          order.id === idDonHang ? { ...order, status: status } : order
         )
       );
       setSuccessSnackbar(true);
@@ -86,7 +86,7 @@ const Orderlist = () => {
 
   const handleOpenDialog = (order) => {
     setSelectedOrder(order);
-    fetchOrderDetails(order.idDonHang);
+    fetchOrderDetails(order.id);
     setDialogOpen(true);
   };
 
@@ -191,15 +191,15 @@ const Orderlist = () => {
         </TableHead>
         <TableBody>
           {orders.map((order) => (
-            <TableRow key={order.idDonHang}>
-              <TableCell>{order.idDonHang}</TableCell>
-              <TableCell>{order.tenKhachHang}</TableCell>
-              <TableCell>{order.diaChi}</TableCell>
-              <TableCell>{order.sodienthoai}</TableCell>
-              <TableCell>{order.phuongThucThanhToan}</TableCell>
-              <TableCell>{order.trangThai}</TableCell>
-              <TableCell>{order.tongtien.toLocaleString()} VND</TableCell>
-              <TableCell>{new Date(order.createDate).toLocaleString()}</TableCell>
+            <TableRow key={order.id}>
+              <TableCell>{order.id}</TableCell>
+              <TableCell>{order.name}</TableCell>
+              <TableCell>{order.address}</TableCell>
+              <TableCell>{order.phone_number}</TableCell>
+              <TableCell>{order.payment_method}</TableCell>
+              <TableCell>{order.status}</TableCell>
+              <TableCell>{order.total_price.toLocaleString()} VND</TableCell>
+              <TableCell>{new Date(order.created_at).toLocaleString()}</TableCell>
               <TableCell>
                 <Button
                   variant="contained"

@@ -1,6 +1,9 @@
 import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 import ProtectedRoute from "../views/FunctionUser/ProtectedRoute";
+import { element } from "prop-types";
+import FormPositionUD from "../views/forms/FormPosition.js";
+import Calendar from "../views/forms/FormSchedules.js";
 /****Layouts*****/
 const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
 const UserLayout = lazy(() => import("../layouts/UserLayout.js"));
@@ -39,7 +42,7 @@ const OderPage = lazy(() => import("../views/ui/OrderPage.js"));
 const CreatePayment = lazy(() => import("../views/ui/createPayment.js"));
 const PaymentCallbackVnpay = lazy(() => import("../views/ui/PaymentCallbackVnpay.js"));
 const ProductDetailPage = lazy(() => import("../views/forms/ProductDetail.js"));
-const AdminLogin = lazy(() => import("../views/FunctionUser/AdminLogin.js")); 
+const AdminLogin = lazy(() => import("../views/FunctionUser/AdminLogin.js"));
 const ThemeRoutes = [
   {
     path: "/",
@@ -106,6 +109,8 @@ const ThemeRoutes = [
       { path: "formOriginUD", element: <FormOriginUD /> },
       { path: "login", element: <AdminLogin /> },
       { path: "giaohang", element: <Giaohang /> },
+      { path: "chucvu", element: <FormPositionUD /> },
+      { path: "lichtrinh", element: <Calendar /> }
     ],
   },
 ];

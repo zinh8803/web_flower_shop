@@ -20,13 +20,11 @@ const EmployeeList = () => {
   const [loading, setLoading] = useState(true);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [employeeData, setEmployeeData] = useState({
-    taiKhoan: "",
     matKhau: "",
     email: "",
-    tenKhachHang: "",
-    gioiTinh: "",
-    soDienThoai: "",
-    diaChi: "",
+    name: "",
+    phone_number: "",
+    address: "",
   });
 
   const [deleteModal, setDeleteModal] = useState(false);
@@ -35,11 +33,18 @@ const EmployeeList = () => {
   useEffect(() => {
     fetchEmployees();
   }, []);
-
+  const token = sessionStorage.getItem("authToken");
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get("http://localhost:7000/api/NhanVien");
-      setEmployees(response.data || []);
+      const response = await axios.get("http://127.0.0.1:8000/api/employees"
+        , {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      );
+      setEmployees(response.data.data || []);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -50,13 +55,10 @@ const EmployeeList = () => {
   const handleEdit = (employee) => {
     setEditingEmployee(employee);
     setEmployeeData({
-      taiKhoan: employee.taiKhoan,
-      matKhau: employee.matKhau || "",
       email: employee.email,
-      tenKhachHang: employee.tenKhachHang,
-      gioiTinh: employee.gioiTinh,
-      soDienThoai: employee.soDienThoai,
-      diaChi: employee.diaChi,
+      name: employee.name,
+      phone: employee.phone,
+      address: employee.address,
     });
   };
 
@@ -70,10 +72,17 @@ const EmployeeList = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:7000/api/NhanVien/${id}`);
+      const response = await axios.delete(`http://127.0.0.1:8000/api/employees/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      );
       if (response.status === 200) {
         toast.success("Xóa nhân viên thành công!");
-        setEmployees(employees.filter((emp) => emp.idNhanVien !== id));
+        setEmployees(employees.filter((emp) => emp.id !== id));
         setDeleteModal(false);
       }
     } catch (error) {
@@ -85,11 +94,12 @@ const EmployeeList = () => {
   const handleSave = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:7000/api/NhanVien/${editingEmployee.idNhanVien}`,
+        `http://127.0.0.1:8000/api/employees/${editingEmployee.id}`,
         employeeData,
         {
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
         }
       );
@@ -97,7 +107,7 @@ const EmployeeList = () => {
         toast.success("Cập nhật nhân viên thành công!");
         setEmployees((prev) =>
           prev.map((emp) =>
-            emp.idNhanVien === editingEmployee.idNhanVien ? { ...emp, ...employeeData } : emp
+            emp.id === editingEmployee.idNhanVien ? { ...emp, ...employeeData } : emp
           )
         );
         setEditingEmployee(null);
@@ -128,11 +138,9 @@ const EmployeeList = () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Tài khoản</th>
-            <th>Mật khẩu</th>
             <th>Email</th>
             <th>Họ và tên</th>
-            <th>Giới tính</th>
+            <th>Chức vụ</th>
             <th>Số điện thoại</th>
             <th>Địa chỉ</th>
             <th>Hành động</th>
@@ -140,15 +148,13 @@ const EmployeeList = () => {
         </thead>
         <tbody>
           {employees.map((employee) => (
-            <tr key={employee.idNhanVien}>
-              <td>{employee.idNhanVien}</td>
-              <td>{employee.taiKhoan}</td>
-              <td>{employee.matKhau}</td>
+            <tr key={employee.id}>
+              <td>{employee.id}</td>
               <td>{employee.email}</td>
-              <td>{employee.tenKhachHang}</td>
-              <td>{employee.gioiTinh}</td>
-              <td>{employee.soDienThoai}</td>
-              <td>{employee.diaChi}</td>
+              <td>{employee.name}</td>
+              <td>{employee.position.name}</td>
+              <td>{employee.phone}</td>
+              <td>{employee.address}</td>
               <td>
                 <Button color="warning" onClick={() => handleEdit(employee)} className="me-2">
                   Sửa
@@ -168,15 +174,6 @@ const EmployeeList = () => {
         <ModalBody>
           <Form>
             <FormGroup>
-              <Label for="taiKhoan">Tài khoản</Label>
-              <Input
-                type="text"
-                name="taiKhoan"
-                value={employeeData.taiKhoan}
-                onChange={handleInputChange}
-              />
-            </FormGroup>
-            <FormGroup>
               <Label for="email">Email</Label>
               <Input
                 type="email"
@@ -190,25 +187,17 @@ const EmployeeList = () => {
               <Input
                 type="text"
                 name="tenKhachHang"
-                value={employeeData.tenKhachHang}
+                value={employeeData.name}
                 onChange={handleInputChange}
               />
             </FormGroup>
-            <FormGroup>
-              <Label for="gioiTinh">Giới tính</Label>
-              <Input
-                type="text"
-                name="gioiTinh"
-                value={employeeData.gioiTinh}
-                onChange={handleInputChange}
-              />
-            </FormGroup>
+
             <FormGroup>
               <Label for="soDienThoai">Số điện thoại</Label>
               <Input
                 type="text"
                 name="soDienThoai"
-                value={employeeData.soDienThoai}
+                value={employeeData.phone}
                 onChange={handleInputChange}
               />
             </FormGroup>
@@ -217,7 +206,7 @@ const EmployeeList = () => {
               <Input
                 type="text"
                 name="diaChi"
-                value={employeeData.diaChi}
+                value={employeeData.address}
                 onChange={handleInputChange}
               />
             </FormGroup>
@@ -240,7 +229,7 @@ const EmployeeList = () => {
         </ModalHeader>
         <ModalBody>
           Bạn có chắc chắn muốn xóa nhân viên{" "}
-          <strong>{employeeToDelete?.tenKhachHang}</strong> không?
+          <strong>{employeeToDelete?.name}</strong> không?
         </ModalBody>
         <ModalFooter>
           <Button color="danger" onClick={() => handleDelete(employeeToDelete.idNhanVien)}>

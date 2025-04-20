@@ -8,10 +8,14 @@ import {
   Alert,
   Container,
 } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 const FormOrig = () => {
   const [categoryName, setCategoryName] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+
   const [successSnackbar, setSuccessSnackbar] = useState(false);
   const [errorSnackbar, setErrorSnackbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -25,27 +29,38 @@ const FormOrig = () => {
       return;
     }
 
+    const userDetails = JSON.parse(sessionStorage.getItem("userDetails"));
+    const token = sessionStorage.getItem("authToken");
+
+    const formData = new FormData();
+
+    formData.append("name", categoryName);
+    formData.append("employee_id", parseInt(userDetails.id));
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
     try {
-      const response = await axios.post(
-        `http://localhost:7000/api/LoaiHangHoa?loaiHangHoa=${encodeURIComponent(
-          categoryName
-        )}`
-      );
+      const response = await axios.post(`http://127.0.0.1:8000/api/categories`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
       if (response.status === 200 || response.status === 201) {
+        toast.success("Thêm sản phẩm thành công");
         setCategoryName("");
-        setSuccessSnackbar(true);
+        setImageFile(null);
       }
     } catch (error) {
       if (error.response) {
-        // If server returns an error
         setErrorMessage(
           error.response.data?.message || "Thêm loại hàng thất bại. Vui lòng thử lại."
         );
       } else if (error.request) {
-        // If no response received
         setErrorMessage("Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.");
       } else {
-        // Other errors
         setErrorMessage("Đã xảy ra lỗi không xác định. Vui lòng thử lại.");
       }
       setErrorSnackbar(true);
@@ -53,34 +68,40 @@ const FormOrig = () => {
   };
 
   return (
-    <Container maxWidth="sm-5" sx={{ mt: 4 }}>
-      <Typography variant="h4" align="center" gutterBottom>
-        Thêm Loại Hàng
-      </Typography>
+    <Container maxWidth="md" sx={{ mt: 4 }}>
+      <Box sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2, bgcolor: "#f9f9f9" }}>
+        <Typography variant="h4" gutterBottom align="center">
+          Thêm loại hàng mới
+        </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <Box sx={{ mb: 2 }}>
+        {errorMessage && <Alert severity="error" sx={{ mb: 2 }}>{errorMessage}</Alert>}
+
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
           <TextField
-            fullWidth
             label="Tên loại hàng"
+            fullWidth
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
-            variant="outlined"
+            sx={{ mb: 2 }}
             required
           />
-        </Box>
-        <Button
-          type="submit"
-          variant="contained"
-          color="success"
-          fullWidth
-          sx={{ py: 1 }}
-        >
-          Lưu
-        </Button>
-      </form>
 
-      {/* Success Snackbar */}
+          <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }}>
+            Chọn hình ảnh
+            <input
+              type="file"
+              hidden
+              onChange={(e) => setImageFile(e.target.files[0])}
+              required
+            />
+          </Button>
+
+          <Button variant="contained" color="primary" type="submit" fullWidth>
+            Lưu loại hàng
+          </Button>
+        </form>
+      </Box>
+
       <Snackbar
         open={successSnackbar}
         autoHideDuration={3000}
@@ -96,7 +117,6 @@ const FormOrig = () => {
         </Alert>
       </Snackbar>
 
-      {/* Error Snackbar */}
       <Snackbar
         open={errorSnackbar}
         autoHideDuration={3000}
@@ -111,6 +131,7 @@ const FormOrig = () => {
           {errorMessage}
         </Alert>
       </Snackbar>
+      <ToastContainer position="top-center" />
     </Container>
   );
 };

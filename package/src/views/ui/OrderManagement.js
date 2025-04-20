@@ -80,20 +80,20 @@ const OrderManagement = () => {
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, selectedOrigin, products]);
 
-  const handleAddToCart = (product) => {
-    const existingItem = cart.find((item) => item.idSanPham === product.idSanPham);
-    if (existingItem) {
-      setCart((prevCart) =>
-        prevCart.map((item) =>
-          item.idSanPham === product.idSanPham
-            ? { ...item, quantity: Math.min(item.quantity + 1, item.tonKho) }
-            : item
-        )
-      );
-    } else {
-      setCart((prevCart) => [...prevCart, { ...product, quantity: 1 }]);
-    }
-  };
+  // const handleAddToCart = (product) => {
+  //   const existingItem = cart.find((item) => item.idSanPham === product.idSanPham);
+  //   if (existingItem) {
+  //     setCart((prevCart) =>
+  //       prevCart.map((item) =>
+  //         item.idSanPham === product.idSanPham
+  //           ? { ...item, quantity: Math.min(item.quantity + 1, item.tonKho) }
+  //           : item
+  //       )
+  //     );
+  //   } else {
+  //     setCart((prevCart) => [...prevCart, { ...product, quantity: 1 }]);
+  //   }
+  // };
 
   const handleRemoveFromCart = (idSanPham) => {
     setCart(cart.filter((item) => item.idSanPham !== idSanPham));
@@ -121,7 +121,7 @@ const OrderManagement = () => {
       alert("Không thể đặt hàng. Một số sản phẩm trong giỏ có số lượng bằng 0.");
       return;
     }
-    
+
     const orderData = {
       khachhangId: 1,
       tenKhachHang: customerInfo.name,
@@ -151,7 +151,7 @@ const OrderManagement = () => {
   return (
     <Container maxWidth="lg-6">
       <Typography variant="h4" align="center" gutterBottom>
-        Quản lý đơn hàng tại quầy
+        Quản lý đơn hàng
       </Typography>
       <Snackbar
         open={successSnackbar}
@@ -165,7 +165,7 @@ const OrderManagement = () => {
       </Snackbar>
       {/* Bộ lọc */}
       <Box sx={{ display: "flex", gap: 2, mb: 4 }}>
-        <TextField
+        {/* <TextField
           label="Tìm kiếm sản phẩm"
           fullWidth
           value={searchTerm}
@@ -184,8 +184,8 @@ const OrderManagement = () => {
               {cat.tenLoaiHangHoa}
             </MenuItem>
           ))}
-        </TextField>
-        <TextField
+        </TextField> */}
+        {/* <TextField
           label="Nguồn gốc"
           select
           fullWidth
@@ -198,51 +198,51 @@ const OrderManagement = () => {
               {origin.tenXuatXu}
             </MenuItem>
           ))}
-        </TextField>
+        </TextField> */}
       </Box>
 
-      {/* Danh sách sản phẩm */}
+      {/* Danh sách sản phẩm
       <Grid container spacing={2} sx={{ maxHeight: 400, overflowY: "auto", mb: 4 }}>
-  {filteredProducts.map((product) => (
-    <Grid item xs={12} sm={6} md={4} lg={3} key={product.idSanPham}>
-      <Card>
-        <CardMedia
-          component="img"
-          height="120"
-          image={getImageUrl(product.hinhAnh)}
-          alt={product.tenSanPham}
-          sx={{ objectFit: "contain" }}
-        />
-        <CardContent>
-          <Typography variant="h6" textAlign="center">
-            {product.tenSanPham}
-          </Typography>
-          <Typography color="textSecondary" textAlign="center">
-            Giá: {product.gia.toLocaleString()} VND
-          </Typography>
-          <Typography color={product.tonKho > 0 ? "textPrimary" : "error"} textAlign="center">
-            {product.tonKho > 0 ? `Tồn kho: ${product.tonKho}` : "Hết hàng"}
-          </Typography>
-        </CardContent>
-        <CardActions>
-          <Button
-            variant="contained"
-            color={product.tonKho > 0 ? "primary" : "secondary"}
-            fullWidth
-            onClick={() => handleAddToCart(product)}
-            disabled={product.tonKho === 0}
-          >
-            {product.tonKho > 0 ? "Thêm vào giỏ" : "Hết hàng"}
-          </Button>
-        </CardActions>
-      </Card>
-    </Grid>
-  ))}
-</Grid>
+        {filteredProducts.map((product) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={product.idSanPham}>
+            <Card>
+              <CardMedia
+                component="img"
+                height="120"
+                image={getImageUrl(product.hinhAnh)}
+                alt={product.tenSanPham}
+                sx={{ objectFit: "contain" }}
+              />
+              <CardContent>
+                <Typography variant="h6" textAlign="center">
+                  {product.tenSanPham}
+                </Typography>
+                <Typography color="textSecondary" textAlign="center">
+                  Giá: {product.gia.toLocaleString()} VND
+                </Typography>
+                <Typography color={product.tonKho > 0 ? "textPrimary" : "error"} textAlign="center">
+                  {product.tonKho > 0 ? `Tồn kho: ${product.tonKho}` : "Hết hàng"}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  variant="contained"
+                  color={product.tonKho > 0 ? "primary" : "secondary"}
+                  fullWidth
+                  onClick={() => handleAddToCart(product)}
+                  disabled={product.tonKho === 0}
+                >
+                  {product.tonKho > 0 ? "Thêm vào giỏ" : "Hết hàng"}
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid> */}
 
 
       {/* Giỏ hàng */}
-      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+      {/* <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
         <Typography variant="h6" gutterBottom>
           Giỏ hàng
         </Typography>
@@ -293,8 +293,8 @@ const OrderManagement = () => {
         <Button variant="contained" color="success" fullWidth onClick={handleSubmitOrder}>
           Tạo đơn hàng
         </Button>
-      </Paper>
-<Orderlist/>
+      </Paper> */}
+      <Orderlist />
     </Container>
   );
 };
