@@ -30,8 +30,8 @@ function ProductDetailPage() {
     // Fetch product details
     const fetchProductDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:7000/api/HangHoa/${productId}`);
-        setProduct(response.data);
+        const response = await axios.get(`http://127.0.0.1:8000/api/products/${productId}`);
+        setProduct(response.data.data);
       } catch (err) {
         setError("Có lỗi xảy ra khi tải dữ liệu sản phẩm");
       } finally {
@@ -42,33 +42,21 @@ function ProductDetailPage() {
     // Fetch categories
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:7000/api/LoaiHangHoa");
-        setCategories(response.data);
+        const response = await axios.get("http://127.0.0.1:8000/api/categories");
+        setCategories(response.data.data);
       } catch (err) {
         console.error("Lỗi khi gọi API loại sản phẩm:", err);
       }
     };
 
     // Fetch origins
-    const fetchOrigins = async () => {
-      try {
-        const response = await axios.get("http://localhost:7000/api/XuatXu");
-        setOrigins(response.data);
-      } catch (err) {
-        console.error("Lỗi khi gọi API nguồn gốc sản phẩm:", err);
-      }
-    };
+
 
     fetchProductDetails();
     fetchCategories();
-    fetchOrigins();
   }, [productId]);
 
-  const getImageUrl = (url) => {
-    if (!url) return ""; // Handle null or undefined URLs
-    const imagePath = url.split("WebRootPath\\")[1];
-    return `http://localhost:7000/${imagePath}`;
-  };
+
 
   const addToCart = (product) => {
     if (!isLoggedIn) {
@@ -77,7 +65,7 @@ function ProductDetailPage() {
     }
 
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existingProduct = cart.find((item) => item.idSanPham === product.idSanPham);
+    const existingProduct = cart.find((item) => item.id === product.id);
 
     if (existingProduct) {
       existingProduct.quantity += 1;
@@ -134,46 +122,39 @@ function ProductDetailPage() {
           {/* Product Image */}
           <CardMedia
             component="img"
-            alt={product.tenSanPham}
+            alt={product.name}
             height="400"
-            image={getImageUrl(product.hinhAnh)}
+            image={(product.image_url)}
             sx={{
-    height: "400px", 
-    width: "100%", 
-    objectFit: "contain", 
-    backgroundColor: "#f5f5f5", 
-  }}
+              height: "400px",
+              width: "100%",
+              objectFit: "contain",
+              backgroundColor: "#f5f5f5",
+            }}
           />
 
           <CardContent>
             <Typography variant="h4" gutterBottom>
-              {product.tenSanPham}
+              {product.name}
             </Typography>
             <Typography variant="h5" color="primary" gutterBottom>
-              {product.gia.toLocaleString()} VND
+              {product.final_price} VND
             </Typography>
             <Typography variant="body1" paragraph>
               <strong>Mô tả: </strong>
-              {product.moTa}
+              {product.description}
             </Typography>
 
             <Box display="flex" gap={1} marginBottom={2}>
-              <Chip
+              {/* <Chip
                 label={
-                  categories.find((category) => category.idLoaiHangHoa === product.idLoaiHangHoa)
-                    ?.tenLoaiHangHoa || "Không rõ"
+                  categories.find((category) => category.id === product.id)
+                    ?.name || "Không rõ"
                 }
                 color="info"
                 variant="outlined"
-              />
-              <Chip
-                label={
-                  origins.find((origin) => origin.idXuatXu === product.idXuatXu)
-                    ?.tenXuatXu || "Không rõ"
-                }
-                color="success"
-                variant="outlined"
-              />
+              /> */}
+
             </Box>
           </CardContent>
 
@@ -183,9 +164,9 @@ function ProductDetailPage() {
               color="primary"
               size="large"
               onClick={() => addToCart(product)}
-              disabled={product.tonKho <= 0}
+              disabled={product.stock <= 0}
             >
-              {product.tonKho > 0 ? "Thêm vào giỏ hàng" : "Hết hàng"}
+              {product.stock > 0 ? "Thêm vào giỏ hàng" : "Hết hàng"}
             </Button>
           </CardActions>
         </Card>

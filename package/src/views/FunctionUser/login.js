@@ -16,11 +16,11 @@ const Login = () => {
         setErrorMessage("");
 
         try {
-            const response = await axios.post("http://localhost:7000/api/Khachhang/login", {
-                taiKhoan: userName,
-                matKhau: password
+            const response = await axios.post("http://127.0.0.1:8000/api/login", {
+                email: userName,
+                password: password
             });
-            const user = response.data;
+            const user = response.data.data;
             const accessToken = response.headers['authorization'] ? response.headers['authorization'].split(' ')[1] : '';
             const expiresIn = response.headers['expiresin'] || '';
 

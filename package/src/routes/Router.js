@@ -61,7 +61,7 @@ const ThemeRoutes = [
       { path: "/UserContext", element: <UserContext /> },
       { path: "/updateuser", element: <UpdateUser /> },
       { path: "/cartpage", element: <CartPage /> },
-      { path: "/product/:productId", element: <ProductDetailPage /> },
+      { path: "/products/:productId", element: <ProductDetailPage /> },
       { path: "/footer", element: <Footer /> },
       { path: "/cartpage/orderpage", element: <OderPage /> },
       { path: "/PaymentCallbackVnpay", element: <PaymentCallbackVnpay /> },

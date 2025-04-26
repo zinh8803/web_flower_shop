@@ -38,15 +38,13 @@ function ProductList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productRes = await axios.get("http://localhost:7000/api/HangHoa");
+        const productRes = await axios.get("http://127.0.0.1:8000/api/products");
         const categoryRes = await axios.get(
-          "http://localhost:7000/api/LoaiHangHoa"
+          "http://127.0.0.1:8000/api/categories"
         );
-        const originRes = await axios.get("http://localhost:7000/api/XuatXu");
 
-        setProducts(productRes.data || []);
-        setCategories(categoryRes.data || []);
-        setOrigins(originRes.data || []);
+        setProducts(productRes.data.data || []);
+        setCategories(categoryRes.data.data || []);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -63,21 +61,16 @@ function ProductList() {
 
     if (searchQuery) {
       filtered = filtered.filter((product) =>
-        product.tenSanPham.toLowerCase().includes(searchQuery.toLowerCase())
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     if (selectedCategories.length > 0) {
       filtered = filtered.filter((product) =>
-        selectedCategories.includes(product.idLoaiHangHoa)
+        selectedCategories.includes(product.category_id)
       );
     }
 
-    if (selectedOrigins.length > 0) {
-      filtered = filtered.filter((product) =>
-        selectedOrigins.includes(product.idXuatXu)
-      );
-    }
 
     return filtered;
   }, [products, searchQuery, selectedCategories, selectedOrigins]);
@@ -91,25 +84,14 @@ function ProductList() {
     );
   };
 
-  const handleOriginChange = (e) => {
-    const originId = Number(e.target.value);
-    setSelectedOrigins((prev) =>
-      e.target.checked
-        ? [...prev, originId]
-        : prev.filter((id) => id !== originId)
-    );
-  };
 
-  const getImageUrl = (url) => {
-    if (!url) return "";
-    const imagePath = url.split("WebRootPath\\")[1];
-    return `http://localhost:7000/${imagePath}`;
-  };
+
+
 
   const addToCart = (product) => {
     const updatedCart = [...cart];
     const existingItem = updatedCart.find(
-      (item) => item.idSanPham === product.idSanPham
+      (item) => item.id === product.id
     );
 
     if (existingItem) {
@@ -148,38 +130,20 @@ function ProductList() {
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {categories.map((category) => (
                   <FormControlLabel
-                    key={category.idLoaiHangHoa}
+                    key={category.id}
                     control={
                       <Checkbox
-                        value={category.idLoaiHangHoa}
+                        value={category.id}
                         onChange={handleCategoryChange}
                       />
                     }
-                    label={category.tenLoaiHangHoa}
+                    label={category.name}
                   />
                 ))}
               </Box>
             </Box>
 
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle1" gutterBottom>
-                Nguồn gốc sản phẩm
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {origins.map((origin) => (
-                  <FormControlLabel
-                    key={origin.idXuatXu}
-                    control={
-                      <Checkbox
-                        value={origin.idXuatXu}
-                        onChange={handleOriginChange}
-                      />
-                    }
-                    label={origin.tenXuatXu}
-                  />
-                ))}
-              </Box>
-            </Box>
+
           </Paper>
         </Grid>
 
@@ -187,9 +151,9 @@ function ProductList() {
           <Grid container spacing={2}>
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
-                <Grid item xs={12} sm={6} md={4} key={product.idSanPham}>
+                <Grid item xs={12} sm={6} md={4} key={product.id}>
                   <Link
-                    to={`/product/${product.idSanPham}`}
+                    to={`/products/${product.id}`}
                     style={{ textDecoration: "none" }}
                   >
                     <Card
@@ -203,22 +167,22 @@ function ProductList() {
                     >
                       <CardMedia
                         component="img"
-                        image={getImageUrl(product.hinhAnh)}
-                        alt={product.tenSanPham}
+                        image={(product.image_url)}
+                        alt={product.name}
                         sx={{ height: 180, objectFit: "contain" }}
                       />
                       <CardContent sx={{ textAlign: "center" }}>
                         <Typography variant="subtitle1" fontWeight="bold">
-                          {product.tenSanPham}
+                          {product.name}
                         </Typography>
                         <Typography variant="h6" color="error">
-                          {product.gia.toLocaleString()}đ
+                          {product.final_price.toLocaleString()}đ
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          Tồn kho: {product.tonKho} sản phẩm
+                          Tồn kho: {product.stock} sản phẩm
                         </Typography>
                       </CardContent>
-                      {product.tonKho > 0 ? (
+                      {product.stock > 0 ? (
                         <Button
                           variant="contained"
                           color="success"
