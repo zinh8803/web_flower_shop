@@ -57,8 +57,14 @@ const FormPositionUD = () => {
     };
 
     const handleDelete = async () => {
+        const token = sessionStorage.getItem("authToken");
         try {
-            await axios.delete(`http://127.0.0.1:8000/api/positions/${selectedPosition.id}`);
+            await axios.delete(`http://127.0.0.1:8000/api/positions/${selectedPosition.id}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             toast.success("Xóa chức vụ thành công!");
             fetchPositions();
             setConfirmDeleteModal(false);
@@ -70,12 +76,12 @@ const FormPositionUD = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const token = sessionStorage.getItem("authToken");
 
         if (!positionName.trim()) {
             setErrorMessage("Tên chức vụ không được để trống.");
             return;
         }
-
         try {
             const response = await axios.put(
                 `http://127.0.0.1:8000/api/positions/${selectedPosition.id}`,
@@ -86,6 +92,7 @@ const FormPositionUD = () => {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );

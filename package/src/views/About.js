@@ -1,206 +1,121 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Row, Col, Card, CardBody, CardTitle } from "reactstrap";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Chart from "chart.js/auto";
-import InvoiceTable from "./ui/listHoaDon"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
 const RevenueCharts = () => {
-  const chartRef1 = useRef(null); // Ref cho biểu đồ 1
-  const chartRef2 = useRef(null); // Ref cho biểu đồ 2
-  const chartRef3 = useRef(null); // Ref cho biểu đồ 3
-
-  const [dailyRevenue, setDailyRevenue] = useState({ labels: [], data: [] }); // Dữ liệu biểu đồ 1
-  const [monthlyRevenue, setMonthlyRevenue] = useState({ labels: [], data: [] }); // Dữ liệu biểu đồ 2
-  const [quarterlyRevenue, setQuarterlyRevenue] = useState({ labels: [], data: [] }); // Dữ liệu biểu đồ 3
-  const [totalDailyRevenue, setTotalDailyRevenue] = useState(0); // Tổng doanh thu 7 ngày
-  const [totalMonthlyRevenue, setTotalMonthlyRevenue] = useState(0); // Tổng doanh thu 30 ngày
-  const [totalQuarterlyRevenue, setTotalQuarterlyRevenue] = useState(0); // Tổng doanh thu 4 tháng
-
-  const destroyChart = (chartRef) => {
-    if (chartRef.current && chartRef.current.chart) {
-      chartRef.current.chart.destroy();
-    }
-  };
-
-  const fetchData = async (url, setData, setTotal) => {
-    try {
-      const response = await axios.get(url);
-      const { hoaDons } = response.data;
-
-      const revenueByDay = hoaDons.reduce((acc, bill) => {
-        const date = bill.ngayTao.split("T")[0];
-        acc[date] = (acc[date] || 0) + bill.tongtien;
-        return acc;
-      }, {});
-
-      const labels = Object.keys(revenueByDay);
-      const data = Object.values(revenueByDay);
-      const totalRevenue = data.reduce((sum, value) => sum + value, 0);
-
-      setData({ labels, data });
-      setTotal(totalRevenue);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  const [invoices, setInvoices] = useState([]);
+  const [filterType, setFilterType] = useState("week");
+  const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    fetchData("http://localhost:7000/api/HoaDon/7days", setDailyRevenue, setTotalDailyRevenue);
-    fetchData("http://localhost:7000/api/HoaDon/1month", setMonthlyRevenue, setTotalMonthlyRevenue);
-    fetchData("http://localhost:7000/api/HoaDon/4months", setQuarterlyRevenue, setTotalQuarterlyRevenue);
+    const fetchInvoices = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/invoices");
+        setInvoices(response.data.data);
+      } catch (error) {
+        console.error("Error fetching invoices:", error);
+      }
+    };
+
+    fetchInvoices();
   }, []);
 
   useEffect(() => {
-    // Vẽ biểu đồ 1 (Line Chart - 7 ngày)
-    destroyChart(chartRef1);
-    if (dailyRevenue.labels.length > 0 && dailyRevenue.data.length > 0) {
-      const ctx1 = chartRef1.current.getContext("2d");
-      chartRef1.current.chart = new Chart(ctx1, {
-        type: "line",
-        data: {
-          labels: dailyRevenue.labels,
-          datasets: [
-            {
-              label: "Doanh thu theo ngày (7 ngày)",
-              data: dailyRevenue.data,
-              borderColor: "rgb(75, 192, 192)",
-              tension: 0.1,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              title: { display: true, text: "Ngày" },
-            },
-            y: {
-              title: { display: true, text: "Doanh thu (VND)" },
-              beginAtZero: true,
-            },
-          },
-        },
-      });
-    }
+    const filtered = filterInvoices(invoices, filterType);
 
-    // Vẽ biểu đồ 2 (Bar Chart - 30 ngày)
-    destroyChart(chartRef2);
-    if (monthlyRevenue.labels.length > 0 && monthlyRevenue.data.length > 0) {
-      const ctx2 = chartRef2.current.getContext("2d");
-      chartRef2.current.chart = new Chart(ctx2, {
-        type: "bar",
-        data: {
-          labels: monthlyRevenue.labels,
-          datasets: [
-            {
-              label: "Doanh thu theo ngày (30 ngày)",
-              data: monthlyRevenue.data,
-              backgroundColor: "rgba(153, 102, 255, 0.6)",
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              title: { display: true, text: "Ngày" },
-            },
-            y: {
-              title: { display: true, text: "Doanh thu (VND)" },
-              beginAtZero: true,
-            },
-          },
-        },
-      });
-    }
+    const cashTotal = calculateTotal(filterByPaymentMethod(filtered, "cash"));
+    const vnpayTotal = calculateTotal(filterByPaymentMethod(filtered, "vnpay"));
 
-    // Vẽ biểu đồ 3 (Line Chart - 4 tháng)
-    destroyChart(chartRef3);
-    if (quarterlyRevenue.labels.length > 0 && quarterlyRevenue.data.length > 0) {
-      const ctx3 = chartRef3.current.getContext("2d");
-      chartRef3.current.chart = new Chart(ctx3, {
-        type: "line",
-        data: {
-          labels: quarterlyRevenue.labels,
-          datasets: [
-            {
-              label: "Doanh thu theo ngày (4 tháng)",
-              data: quarterlyRevenue.data,
-              borderColor: "rgb(255, 159, 64)",
-              tension: 0.1,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              title: { display: true, text: "Ngày" },
-            },
-            y: {
-              title: { display: true, text: "Doanh thu (VND)" },
-              beginAtZero: true,
-            },
-          },
-        },
-      });
-    }
-  }, [dailyRevenue, monthlyRevenue, quarterlyRevenue]);
+    setChartData([
+      { name: "Cash", revenue: cashTotal },
+      { name: "VNPAY", revenue: vnpayTotal },
+    ]);
+  }, [invoices, filterType]);
+
+  const isThisWeek = (date) => {
+    const now = new Date();
+    const firstDayOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1));
+    firstDayOfWeek.setHours(0, 0, 0, 0);
+    const lastDayOfWeek = new Date(firstDayOfWeek);
+    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+    lastDayOfWeek.setHours(23, 59, 59, 999);
+    return date >= firstDayOfWeek && date <= lastDayOfWeek;
+  };
+
+  const isThisMonth = (date) => {
+    const now = new Date();
+    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+  };
+
+  const isThisYear = (date) => {
+    const now = new Date();
+    return date.getFullYear() === now.getFullYear();
+  };
+
+  const filterInvoices = (invoices, type) => {
+    return invoices.filter((invoice) => {
+      const date = new Date(invoice.created_at);
+      if (type === "week") return isThisWeek(date);
+      if (type === "month") return isThisMonth(date);
+      if (type === "year") return isThisYear(date);
+      return false;
+    });
+  };
+
+  const filterByPaymentMethod = (invoices, method) => {
+    return invoices.filter(
+      (invoice) => invoice.order_id && invoice.order_id.payment_method === method
+    );
+  };
+
+  const calculateTotal = (invoices) => {
+    return invoices.reduce((sum, invoice) => {
+      const totalPrice = invoice.order_id ? parseFloat(invoice.order_id.total_price) : 0;
+      return sum + totalPrice;
+    }, 0);
+  };
 
   return (
-    <Row>
-
-      <Row>
-        {/* Biểu đồ 1 */}
-        <Col md="4">
-          <Card>
-            <CardBody>
-              <CardTitle tag="h5">Biểu đồ 1: Doanh thu 7 ngày (Line Chart)</CardTitle>
-              <div style={{ height: "200px" }}>
-                <canvas ref={chartRef1}></canvas>
-              </div>
-              <p className="text-center mt-3">
-                <strong>Tổng doanh thu: {totalDailyRevenue.toLocaleString()} VND</strong>
-              </p>
-            </CardBody>
-          </Card>
-        </Col>
-
-        {/* Biểu đồ 2 */}
-        <Col md="4">
-          <Card>
-            <CardBody>
-              <CardTitle tag="h5">Biểu đồ 2: Doanh thu 30 ngày (Bar Chart)</CardTitle>
-              <div style={{ height: "200px" }}>
-                <canvas ref={chartRef2}></canvas>
-              </div>
-              <p className="text-center mt-3">
-                <strong>Tổng doanh thu: {totalMonthlyRevenue.toLocaleString()} VND</strong>
-              </p>
-            </CardBody>
-          </Card>
-        </Col>
-
-        {/* Biểu đồ 3 */}
-        <Col md="4">
-          <Card>
-            <CardBody>
-              <CardTitle tag="h5">Biểu đồ 3: Doanh thu 4 tháng (Line Chart)</CardTitle>
-              <div style={{ height: "200px" }}>
-                <canvas ref={chartRef3}></canvas>
-              </div>
-              <p className="text-center mt-3">
-                <strong>Tổng doanh thu: {totalQuarterlyRevenue.toLocaleString()} VND</strong>
-              </p>
-            </CardBody>
-          </Card>
-        </Col>
-
-      </Row>
-      <InvoiceTable />
-    </Row>
+    <div>
+      <h2 className="text-center mb-4">Doanh thu theo phương thức thanh toán</h2>
+      <div className="text-center mb-3">
+        <button
+          className={`btn btn-${filterType === "week" ? "primary" : "outline-primary"} mx-1`}
+          onClick={() => setFilterType("week")}
+        >
+          Tuần này
+        </button>
+        <button
+          className={`btn btn-${filterType === "month" ? "success" : "outline-success"} mx-1`}
+          onClick={() => setFilterType("month")}
+        >
+          Tháng này
+        </button>
+        <button
+          className={`btn btn-${filterType === "year" ? "warning" : "outline-warning"} mx-1`}
+          onClick={() => setFilterType("year")}
+        >
+          Năm nay
+        </button>
+      </div>
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip formatter={(value) => `${value.toLocaleString()} VNĐ`} />
+          <Legend />
+          <Bar dataKey="revenue" fill="#8884d8" name="Doanh thu" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

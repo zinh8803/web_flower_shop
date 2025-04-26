@@ -4,6 +4,9 @@ import ProtectedRoute from "../views/FunctionUser/ProtectedRoute";
 import { element } from "prop-types";
 import FormPositionUD from "../views/forms/FormPosition.js";
 import Calendar from "../views/forms/FormSchedules.js";
+import FormPosition from "../views/forms/FormthemPosition.js";
+import { Logout } from "@mui/icons-material";
+import Logout11 from "../views/forms/logoutadmin.js";
 /****Layouts*****/
 const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
 const UserLayout = lazy(() => import("../layouts/UserLayout.js"));
@@ -108,9 +111,11 @@ const ThemeRoutes = [
       { path: "formOrigin", element: <FormOrigin /> },
       { path: "formOriginUD", element: <FormOriginUD /> },
       { path: "login", element: <AdminLogin /> },
-      { path: "giaohang", element: <Giaohang /> },
+      { path: "chucvu&lichtrinh", element: <Giaohang /> },
       { path: "chucvu", element: <FormPositionUD /> },
-      { path: "lichtrinh", element: <Calendar /> }
+      { path: "themchucvu", element: <FormPosition /> },
+      { path: "lichtrinh", element: <Calendar /> },
+      { path: "logout", element: <Logout11 /> }
     ],
   },
 ];

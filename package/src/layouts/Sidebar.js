@@ -26,8 +26,8 @@ const navigation = [
     icon: "bi  bi-person-fill",
   },
   {
-    title: "Quản lý giao hàng ",
-    href: "giaohang",
+    title: "chức vụ lịch trình",
+    href: "chucvu&lichtrinh",
     icon: "bi  bi-person-fill",
   },
   {

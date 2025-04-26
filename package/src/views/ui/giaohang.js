@@ -18,6 +18,8 @@ import FormAddEmployee from "../forms/FormAddNV";
 import DeliveryReceiptPage from "../forms/listgiaohang"
 import FormPositionUD from "../forms/FormPosition";
 import Calendar from "../forms/FormSchedules";
+import FormPosition from "../forms/FormthemPosition";
+import FormSchedule from "../forms/schedules";
 const Giaohang = () => {
   const [cSelected, setCSelected] = useState("");
   const [categories, setCategories] = useState([]);
@@ -52,11 +54,11 @@ const Giaohang = () => {
               <Button
                 className="btn btn-info ms-5"
                 onClick={() => setActiveForm(activeForm === "addOrigin" ? "" : "addOrigin")}>
-                {activeForm === "addOrigin" ? "Đóng Form Thêm Xuất Xứ" : "Thêm xuất xứ"}
+                {activeForm === "addOrigin" ? "Đóng Form Chức vụ" : "Thêm Chức vụ"}
               </Button>
 
               <FormPositionUD />
-              {activeForm === "addOrigin" && <FormOrigin />}
+              {activeForm === "addOrigin" && <FormPosition />}
             </CardBody>
           </Card>
 
@@ -71,11 +73,11 @@ const Giaohang = () => {
               <Button
                 className="btn btn-info ms-5"
                 onClick={() => setActiveForm(activeForm === "addOrigin" ? "" : "addOrigin")}>
-                {activeForm === "addOrigin" ? "Đóng Form Thêm Xuất Xứ" : "Thêm xuất xứ"}
+                {activeForm === "addOrigin" ? "Đóng Form Thêm lịch trình" : "Thêm lịch trình"}
               </Button>
 
               <Calendar />
-              {activeForm === "addOrigin" && <FormOrigin />}
+              {activeForm === "addOrigin" && <FormSchedule />}
             </CardBody>
           </Card>
         </CardBody>
