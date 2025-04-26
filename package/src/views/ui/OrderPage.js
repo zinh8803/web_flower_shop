@@ -29,18 +29,22 @@ const OrderPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userData = JSON.parse(sessionStorage.getItem("user"));
-
-    if (userData && userData.id) {
-      setUserId(userData.id);
+    const token = (sessionStorage.getItem("token"));
+    if (token) {
 
       axios
-        .get(`http://localhost:7000/api/Khachhang/id?id=${userData.id}`)
+        .get(`http://127.0.0.1:8000/api/user/profile`, {
+
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
-          const userData = response.data;
-          setName(userData.tenKhachHang);
-          setPhone(userData.soDienThoai);
-          setAddress(userData.diaChi);
+          const userData = response.data.data;
+          setName(userData.name);
+          setPhone(userData.phone_number);
+          setAddress(userData.address);
         })
         .catch(() => {
           console.error("Error fetching user info.");
@@ -173,7 +177,7 @@ const OrderPage = () => {
             onChange={(e) => setName(e.target.value)}
             fullWidth
             margin="normal"
-          
+
           />
           <TextField
             label="Số điện thoại"
@@ -181,7 +185,7 @@ const OrderPage = () => {
             onChange={(e) => setPhone(e.target.value)}
             fullWidth
             margin="normal"
-           
+
           />
           <TextField
             label="Địa chỉ giao hàng"
@@ -189,7 +193,7 @@ const OrderPage = () => {
             onChange={(e) => setAddress(e.target.value)}
             fullWidth
             margin="normal"
-        
+
           />
         </Box>
 

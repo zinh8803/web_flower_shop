@@ -79,27 +79,36 @@ const ThemeRoutes = [
       {
         path: "OrderManagement",
         element: (
-
-          <OrderManagement />
-
+          <ProtectedRoute>
+            <OrderManagement />
+          </ProtectedRoute>
         ),
       },
       {
         path: "EmployeeManagement",
         element: (
-
-          <EmployeeManagement />
-
+          <ProtectedRoute>
+            <EmployeeManagement />
+          </ProtectedRoute>
         ),
       },
       {
         path: "ProductManagement",
         element: (
-
-          <ProductManagement />
-
+          <ProtectedRoute>
+            <ProductManagement />
+          </ProtectedRoute>
         ),
       },
+      {
+        path: "chucvu&lichtrinh",
+        element:
+          <ProtectedRoute>
+            <Giaohang />
+          </ProtectedRoute>
+
+      },
+
       { path: "cards", element: <Cards /> },
       { path: "grid", element: <Grid /> },
       { path: "table", element: <Tables /> },
@@ -111,7 +120,7 @@ const ThemeRoutes = [
       { path: "formOrigin", element: <FormOrigin /> },
       { path: "formOriginUD", element: <FormOriginUD /> },
       { path: "login", element: <AdminLogin /> },
-      { path: "chucvu&lichtrinh", element: <Giaohang /> },
+
       { path: "chucvu", element: <FormPositionUD /> },
       { path: "themchucvu", element: <FormPosition /> },
       { path: "lichtrinh", element: <Calendar /> },

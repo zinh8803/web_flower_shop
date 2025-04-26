@@ -34,18 +34,13 @@ const CartPage = () => {
   const navigate = useNavigate();
 
   // Hàm lấy URL hình ảnh
-  const getImageUrl = (url) => {
-    if (!url) return "";
-    const imagePath = url.split("WebRootPath\\")[1];
-    return `http://localhost:7000/${imagePath}`;
-  };
 
   // Fetch danh sách sản phẩm
   useEffect(() => {
     axios
-      .get("http://localhost:7000/api/HangHoa")
+      .get("http://127.0.0.1:8000/api/products")
       .then((response) => {
-        setProducts(response.data || []);
+        setProducts(response.data.data || []);
         setLoading(false);
       })
       .catch(() => {
@@ -55,24 +50,26 @@ const CartPage = () => {
   }, []);
 
   // Tính toán tổng tiền
-  const total = cart.reduce((total, item) => total + item.gia * item.quantity, 0);
+  const total = cart.reduce((total, item) => total + item.final_price * item.quantity, 0);
   const vat = total * 0.08;
   const totalWithVAT = total + vat;
 
   // Hàm cập nhật số lượng sản phẩm
-  const updateQuantity = (idSanPham, newQuantity, tonKho) => {
-    if (isNaN(newQuantity) || newQuantity < 1) newQuantity = 1; // Gán 1 nếu giá trị không hợp lệ
-    if (newQuantity > tonKho) return; // Kiểm tra tồn kho
+  const updateQuantity = (id, newQuantity, tonKho) => {
+    if (isNaN(newQuantity) || newQuantity < 1) newQuantity = 1;
+    if (newQuantity > tonKho) return;
 
     const updatedCart = cart.map((item) =>
-      item.idSanPham === idSanPham ? { ...item, quantity: newQuantity } : item
+      item.id === id ? { ...item, quantity: newQuantity } : item
     );
     setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
+
 
   // Hàm xóa sản phẩm khỏi giỏ hàng
   const removeFromCart = (idSanPham) => {
-    const updatedCart = cart.filter((item) => item.idSanPham !== idSanPham);
+    const updatedCart = cart.filter((item) => item.id !== idSanPham);
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
@@ -93,26 +90,26 @@ const CartPage = () => {
         {/* Danh sách sản phẩm trong giỏ hàng */}
         <Grid item xs={12} md={8}>
           {cart.map((item) => {
-            const product = products.find((p) => p.idSanPham === item.idSanPham);
-            const tonKho = product ? product.tonKho : 0;
+            const product = products.find((p) => p.id === item.id);
+            const tonKho = product ? product.stock : 0;
 
             return (
-              <Card key={item.idSanPham} sx={{ mb: 2, display: "flex", alignItems: "center", padding: 2 }}>
+              <Card key={item.id} sx={{ mb: 2, display: "flex", alignItems: "center", padding: 2 }}>
                 {/* Hình ảnh */}
                 <CardMedia
                   component="img"
-                  image={getImageUrl(item.hinhAnh)}
-                  alt={item.tenSanPham}
+                  image={(item.image_url)}
+                  alt={item.name}
                   sx={{ width: 80, height: 80, objectFit: "cover", borderRadius: 1, marginRight: 2 }}
                 />
 
                 {/* Nội dung sản phẩm */}
                 <CardContent sx={{ flex: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                    {item.tenSanPham}
+                    {item.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {item.gia.toLocaleString()} đ
+                    {item.final_price.toLocaleString()} đ
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Tồn kho: {tonKho}
@@ -123,31 +120,31 @@ const CartPage = () => {
                 <CardActions>
                   <Tooltip title="Giảm số lượng">
                     <IconButton
-                      onClick={() => updateQuantity(item.idSanPham, item.quantity - 1, tonKho)}
+                      onClick={() => updateQuantity(item.id, item.quantity - 1, tonKho)}
                       disabled={item.quantity <= 1}
                     >
                       <RemoveIcon />
                     </IconButton>
                   </Tooltip>
                   <TextField
-  type="number"
-  size="small"
-  value={item.quantity}
-  onChange={(e) =>
-    updateQuantity(item.idSanPham, parseInt(e.target.value, 10), tonKho)
-  }
-  onBlur={() => updateQuantity(item.idSanPham, item.quantity, tonKho)}
-  inputProps={{
-    min: 1,
-    max: tonKho,
-    className: 'centered-input', // Thêm lớp CSS tùy chỉnh
-  }}
-  sx={{ width: 120, mx: 1 }}
-/>
+                    type="number"
+                    size="small"
+                    value={item.quantity}
+                    onChange={(e) =>
+                      updateQuantity(item.id, parseInt(e.target.value, 10), tonKho)
+                    }
+                    onBlur={() => updateQuantity(item.id, item.quantity, tonKho)}
+                    inputProps={{
+                      min: 1,
+                      max: tonKho,
+                      className: 'centered-input', // Thêm lớp CSS tùy chỉnh
+                    }}
+                    sx={{ width: 120, mx: 1 }}
+                  />
 
                   <Tooltip title="Tăng số lượng">
                     <IconButton
-                      onClick={() => updateQuantity(item.idSanPham, item.quantity + 1, tonKho)}
+                      onClick={() => updateQuantity(item.id, item.quantity + 1, tonKho)}
                       disabled={item.quantity >= tonKho}
                     >
                       <AddIcon />
@@ -157,7 +154,7 @@ const CartPage = () => {
 
                 {/* Xóa sản phẩm */}
                 <Tooltip title="Xóa sản phẩm">
-                  <IconButton onClick={() => removeFromCart(item.idSanPham)} color="error">
+                  <IconButton onClick={() => removeFromCart(item.id)} color="error">
                     <DeleteIcon />
                   </IconButton>
                 </Tooltip>

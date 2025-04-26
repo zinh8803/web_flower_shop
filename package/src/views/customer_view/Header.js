@@ -23,17 +23,29 @@ function Header() {
   const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null); // Mở Menu Dropdown
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Kiểm tra thông tin người dùng
-    const userData = JSON.parse(sessionStorage.getItem("user"));
-    if (userData && userData.id) {
+    const token = sessionStorage.getItem("token"); // Lấy token string, KHÔNG cần parse
+
+    if (token) {
       axios
-        .get(`http://localhost:7000/api/Khachhang/id?id=${userData.id}`)
-        .then((response) => setUser(response.data))
-        .catch((error) => console.error("Có lỗi khi lấy thông tin người dùng:", error));
+        .get(`http://127.0.0.1:8000/api/user/profile`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => setUser(response.data.data))
+        .catch((error) => {
+          console.error("Có lỗi khi lấy thông tin người dùng:", error);
+          // Nếu lỗi 401 (token hết hạn, sai), thì xóa luôn token
+          if (error.response && error.response.status === 401) {
+            sessionStorage.removeItem("token");
+            navigate("/login");
+          }
+        });
     }
 
     // Lấy số lượng giỏ hàng từ localStorage
@@ -51,11 +63,11 @@ function Header() {
     return () => {
       window.removeEventListener("storage", getCartCount);
     };
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("cart");
-    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token"); // <-- Đúng là phải xóa token
     setUser(null);
     setCartCount(0);
     navigate("/");
@@ -130,7 +142,7 @@ function Header() {
             {/* Dropdown khi đăng nhập */}
             {user ? (
               <Box>
-                <Tooltip title={user?.taiKhoan || "Tài khoản"}>
+                <Tooltip title={user?.name || "Tài khoản"}>
                   <IconButton color="inherit" onClick={handleMenuOpen}>
                     <AccountCircle />
                   </IconButton>

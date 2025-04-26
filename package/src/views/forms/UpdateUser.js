@@ -26,22 +26,25 @@ const UpdateUser = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const userData = JSON.parse(sessionStorage.getItem("user"));
+    const Token = sessionStorage.getItem("token");
 
-    if (userData && userData.id) {
-      setUserId(userData.id);
+    if (Token) {
       axios
-        .get(`http://localhost:7000/api/Khachhang/id?id=${userData.id}`)
+        .get(`http://127.0.0.1:8000/api/user/profile`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Token}`,
+          },
+        }
+        )
         .then((response) => {
-          const userData = response.data;
-          setUserName(userData.taiKhoan);
+          const userData = response.data.data;
+          setUserName(userData.name);
           setEmail(userData.email);
-          setPassword(userData.matKhau);
-          setName(userData.tenKhachHang);
-          setGender(userData.gioiTinh);
-          setPhone(userData.soDienThoai);
-          setAddress(userData.diaChi);
-          setAvatar(userData.avatar); 
+          setName(userData.name);
+          setPhone(userData.phone_number);
+          setAddress(userData.address);
+          setAvatar(userData.avatar);
         })
         .catch((error) => {
           console.error("Có lỗi khi lấy thông tin người dùng:", error);
@@ -53,45 +56,70 @@ const UpdateUser = () => {
   }, []);
 
   const handleSubmit = async (e) => {
+    const Token = sessionStorage.getItem("token");
     e.preventDefault();
 
-    const updatedData = {
-      Id: userId,
-      TaiKhoan: userName,
-      Matkhau: password,
-      Email: email,
-      TenKhachHang: name,
-      GioiTinh: gender,
-      SoDienThoai: phone,
-      DiaChi: address,
-      Avatar: null, // Theo yêu cầu API
-    };
-    
-    console.log("Updated Data: ", updatedData);
     try {
-      const response = await axios.put(
-        "http://localhost:7000/api/Khachhang/update",
-        updatedData,
+      // 1. Gửi thông tin cá nhân trước
+      const profileData = {
+        name: name,
+        email: email,
+        address: address,
+        phone_number: phone,
+      };
+      if (!name || !phone || !address) {
+        toast.error("Vui lòng điền đầy đủ thông tin!");
+        return;
+      }
+      const profileResponse = await axios.put(
+
+        "http://127.0.0.1:8000/api/users/UpdateProfile",
+        profileData,
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${Token}`,
           },
         }
       );
-      console.log("Phản hồi từ server:", response.data);
-      if (response.status === 200) {
-        toast.success("Cập nhật thông tin thành công!");
-      } else {
-        console.error("API trả về lỗi:", response.data);
-        setErrorMessage("Cập nhật thất bại. Vui lòng thử lại.");
-      }
+
+
+
+      toast.success("Cập nhật thành công!");
     } catch (error) {
-      console.error("Có lỗi khi cập nhật thông tin:", error);
-      setErrorMessage(
-        "Có lỗi xảy ra khi kết nối đến server. Vui lòng kiểm tra lại."
-      );
+      console.error("Lỗi khi cập nhật:", error);
+      setErrorMessage("Có lỗi xảy ra khi cập nhật.");
     }
   };
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/users/update-avatar",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      toast.success("Cập nhật avatar thành công!");
+      setAvatar(URL.createObjectURL(file));
+
+    } catch (error) {
+      console.error("Lỗi khi cập nhật avatar:", error);
+      toast.error("Cập nhật avatar thất bại!");
+    }
+  };
+
+
 
   return (
     <Container maxWidth="sm">
@@ -123,7 +151,7 @@ const UpdateUser = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} sx={{ textAlign: "center" }}>
               <Avatar
-                src={avatar ? `http://localhost:7000/${avatar}` : ""}
+                src={avatar}
                 alt="Avatar"
                 sx={{ width: 100, height: 100, margin: "0 auto" }}
               />
@@ -149,16 +177,7 @@ const UpdateUser = () => {
               />
             </Grid>
 
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Mật khẩu"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                variant="outlined"
-              />
-            </Grid>
+
 
             <Grid item xs={12}>
               <TextField
@@ -170,15 +189,7 @@ const UpdateUser = () => {
               />
             </Grid>
 
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Giới tính"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                variant="outlined"
-              />
-            </Grid>
+
 
             <Grid item xs={12}>
               <TextField
@@ -199,7 +210,22 @@ const UpdateUser = () => {
                 variant="outlined"
               />
             </Grid>
-
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                component="label"
+                fullWidth
+                sx={{ mb: 2 }}
+              >
+                Chọn Avatar
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                />
+              </Button>
+            </Grid>
             <Grid item xs={12}>
               <Button type="submit" variant="contained" color="primary" fullWidth>
                 Cập nhật thông tin

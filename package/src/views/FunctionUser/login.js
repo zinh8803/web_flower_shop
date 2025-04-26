@@ -21,16 +21,14 @@ const Login = () => {
                 password: password
             });
             const user = response.data.data;
-            const accessToken = response.headers['authorization'] ? response.headers['authorization'].split(' ')[1] : '';
-            const expiresIn = response.headers['expiresin'] || '';
+            const accessToken = response.data.token;
 
             console.log("Đăng nhập thành công!");
             console.log("Token:", accessToken);
-            console.log("ExpiresIn:", expiresIn);
             console.log("Customer:", user);
 
             if (user) {
-                sessionStorage.setItem("user", JSON.stringify(user));
+                sessionStorage.setItem("token", accessToken);
                 navigate("/");
                 window.location.reload();
             } else {

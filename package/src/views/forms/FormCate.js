@@ -55,7 +55,15 @@ const CategoryManagement = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/categories/${selectedCategory.idLoaiHangHoa}`);
+      await axios.delete(`http://127.0.0.1:8000/api/categories/${selectedCategory.id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`,
+          },
+        }
+
+      );
       toast.success("Xóa loại hàng thành công!");
       fetchCategories();
       setConfirmDeleteModal(false);
