@@ -9,41 +9,57 @@ const FormAddEmployee = () => {
   const [Matkhau, setMatkhau] = useState("");
   const [email, setEmail] = useState("");
   const [tenKhachHang, setTenKhachHang] = useState("");
-  const [gioiTinh, setGioiTinh] = useState("Nam"); // Default to "Nam"
   const [soDienThoai, setSoDienThoai] = useState("");
   const [diaChi, setDiaChi] = useState("");
+  const [positionId, setPositionId] = useState("");
+  const [positions, setPositions] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [existingEmployees, setExistingEmployees] = useState([]);
 
-  // Fetch existing employees
+  // Fetch employees & positions
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get("http://localhost:7000/api/NhanVien");
-        setExistingEmployees(response.data || []);
+        const response = await axios.get("http://127.0.0.1:8000/api/employees", {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`,
+          },
+        });
+        setExistingEmployees(response.data.data || []);
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
     };
+
+    const fetchPositions = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/positions",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        setPositions(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching positions:", error);
+      }
+    };
+
     fetchEmployees();
+    fetchPositions();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check for duplicate username or email
-    const usernameExists = existingEmployees.some(
-      (emp) => emp.taiKhoan.toLowerCase() === taiKhoan.toLowerCase()
-    );
+    // Check for duplicate email
     const emailExists = existingEmployees.some(
-      (emp) => emp.email.toLowerCase() === email.toLowerCase()
+      (emp) => emp.email?.toLowerCase() === email.toLowerCase()
     );
-
-    if (usernameExists) {
-      setErrorMessage("Tài khoản đã tồn tại.");
-      return;
-    }
 
     if (emailExists) {
       setErrorMessage("Email đã tồn tại.");
@@ -51,30 +67,37 @@ const FormAddEmployee = () => {
     }
 
     const employeeData = {
-      TaiKhoan: taiKhoan,
-      Matkhau: Matkhau,
-      Email: email,
-      tenKhachHang: tenKhachHang,
-      GioiTinh: gioiTinh,
-      SoDienThoai: soDienThoai,
-      DiaChi: diaChi,
+      password: Matkhau,
+      email: email,
+      name: tenKhachHang,
+      phone_number: soDienThoai,
+      address: diaChi,
+      position_id: positionId,
     };
 
     try {
       const response = await axios.post(
-        "http://localhost:7000/api/NhanVien",
-        employeeData
+        "http://127.0.0.1:8000/api/employees/register",
+        employeeData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`,
+          },
+        }
       );
-      if (response.status === 200) {
+
+      if (response.status === 201) {
         toast.success("Thêm nhân viên thành công!");
         setIsSuccess(true);
         setErrorMessage("");
         setTaiKhoan("");
+        setMatkhau("");
         setEmail("");
         setTenKhachHang("");
-        setGioiTinh("Nam"); // Reset to default value
         setSoDienThoai("");
         setDiaChi("");
+        setPositionId("");
       }
     } catch (error) {
       setIsSuccess(false);
@@ -92,26 +115,8 @@ const FormAddEmployee = () => {
       {errorMessage && <Alert color="danger">{errorMessage}</Alert>}
 
       <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label for="taiKhoan">Tài khoản</Label>
-          <Input
-            id="taiKhoan"
-            type="text"
-            value={taiKhoan}
-            onChange={(e) => setTaiKhoan(e.target.value)}
-            required
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="taiKhoan">Mật khẩu</Label>
-          <Input
-            id="taiKhoan"
-            type="password"
-            value={Matkhau}
-            onChange={(e) => setMatkhau(e.target.value)}
-            required
-          />
-        </FormGroup>
+
+
         <FormGroup>
           <Label for="email">Email</Label>
           <Input
@@ -119,6 +124,16 @@ const FormAddEmployee = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label for="matKhau">Mật khẩu</Label>
+          <Input
+            id="matKhau"
+            type="password"
+            value={Matkhau}
+            onChange={(e) => setMatkhau(e.target.value)}
             required
           />
         </FormGroup>
@@ -131,18 +146,6 @@ const FormAddEmployee = () => {
             onChange={(e) => setTenKhachHang(e.target.value)}
             required
           />
-        </FormGroup>
-        <FormGroup>
-          <Label for="gioiTinh">Giới tính</Label>
-          <Input
-            id="gioiTinh"
-            type="select"
-            value={gioiTinh}
-            onChange={(e) => setGioiTinh(e.target.value)}
-          >
-            <option value="Nam">Nam</option>
-            <option value="Nữ">Nữ</option>
-          </Input>
         </FormGroup>
         <FormGroup>
           <Label for="soDienThoai">Số điện thoại</Label>
@@ -164,10 +167,28 @@ const FormAddEmployee = () => {
             required
           />
         </FormGroup>
+        <FormGroup>
+          <Label for="position">Chức vụ</Label>
+          <Input
+            id="position"
+            type="select"
+            value={positionId}
+            onChange={(e) => setPositionId(e.target.value)}
+            required
+          >
+            <option value="">-- Chọn chức vụ --</option>
+            {positions.map((pos) => (
+              <option key={pos.id} value={pos.id}>
+                {pos.name}
+              </option>
+            ))}
+          </Input>
+        </FormGroup>
         <Button color="primary" type="submit">
           Lưu
         </Button>
       </Form>
+
       <ToastContainer />
     </div>
   );

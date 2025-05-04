@@ -20,11 +20,11 @@ const EmployeeList = () => {
   const [loading, setLoading] = useState(true);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [employeeData, setEmployeeData] = useState({
-    matKhau: "",
     email: "",
     name: "",
     phone_number: "",
     address: "",
+    position_id: "",
   });
 
   const [deleteModal, setDeleteModal] = useState(false);
@@ -59,6 +59,7 @@ const EmployeeList = () => {
       name: employee.name,
       phone: employee.phone,
       address: employee.address,
+      position_id: employee.position_id,
     });
   };
 
@@ -107,7 +108,7 @@ const EmployeeList = () => {
         toast.success("Cập nhật nhân viên thành công!");
         setEmployees((prev) =>
           prev.map((emp) =>
-            emp.id === editingEmployee.idNhanVien ? { ...emp, ...employeeData } : emp
+            emp.id === editingEmployee.id ? { ...emp, ...employeeData } : emp
           )
         );
         setEditingEmployee(null);
@@ -177,39 +178,61 @@ const EmployeeList = () => {
               <Label for="email">Email</Label>
               <Input
                 type="email"
-                name="email"
+                name="email" // ✅ đúng
                 value={employeeData.email}
                 onChange={handleInputChange}
               />
             </FormGroup>
+
             <FormGroup>
-              <Label for="tenKhachHang">Họ và tên</Label>
+              <Label for="name">Họ và tên</Label>
               <Input
                 type="text"
-                name="tenKhachHang"
+                name="name" // ✅ đúng
                 value={employeeData.name}
                 onChange={handleInputChange}
               />
             </FormGroup>
 
             <FormGroup>
-              <Label for="soDienThoai">Số điện thoại</Label>
+              <Label for="phone">Số điện thoại</Label>
               <Input
                 type="text"
-                name="soDienThoai"
+                name="phone" // ✅ đúng
                 value={employeeData.phone}
                 onChange={handleInputChange}
               />
             </FormGroup>
+
             <FormGroup>
-              <Label for="diaChi">Địa chỉ</Label>
+              <Label for="address">Địa chỉ</Label>
               <Input
                 type="text"
-                name="diaChi"
+                name="address" // ✅ đúng
                 value={employeeData.address}
                 onChange={handleInputChange}
               />
             </FormGroup>
+            <FormGroup>
+              <Label for="position_id">Chức vụ</Label>
+              <Input
+                type="select"
+                name="position_id"
+                value={employeeData.position_id}
+                onChange={handleInputChange}
+              >
+                <option value="">-- Chọn chức vụ --</option>
+                {employees[0]?.position &&
+                  [...new Set(employees.map((e) => JSON.stringify(e.position)))]
+                    .map((str) => JSON.parse(str))
+                    .map((pos) => (
+                      <option key={pos.id} value={pos.id}>
+                        {pos.name}
+                      </option>
+                    ))}
+              </Input>
+            </FormGroup>
+
           </Form>
         </ModalBody>
         <ModalFooter>
@@ -232,7 +255,7 @@ const EmployeeList = () => {
           <strong>{employeeToDelete?.name}</strong> không?
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" onClick={() => handleDelete(employeeToDelete.idNhanVien)}>
+          <Button color="danger" onClick={() => handleDelete(employeeToDelete.id)}>
             Xóa
           </Button>
           <Button color="secondary" onClick={() => setDeleteModal(false)}>
