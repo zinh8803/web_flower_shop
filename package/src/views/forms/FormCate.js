@@ -103,12 +103,12 @@ const CategoryManagement = () => {
           "Authorization": `Bearer ${token}`,
         },
       });
-      console.log("Phản hồi từ server:", res.data); // 👉 Log phản hồi từ API
+      console.log("Phản hồi từ server:", res.data);
       toast.success("Sửa loại hàng thành công!");
       fetchCategories();
       setModalOpen(false);
     } catch (error) {
-      console.error("Lỗi khi gọi API sửa:", error); // 👉 Log lỗi nếu có
+      console.error("Lỗi khi gọi API sửa:", error);
       setErrorMessage("Có lỗi xảy ra khi sửa loại hàng.");
     }
   }; const userDetails = JSON.parse(sessionStorage.getItem("userDetails"));
@@ -128,6 +128,7 @@ const CategoryManagement = () => {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Tên loại hàng</TableCell>
+              <TableCell>Hình ảnh</TableCell>
               <TableCell>Hành động</TableCell>
             </TableRow>
           </TableHead>

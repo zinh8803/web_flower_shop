@@ -32,7 +32,7 @@ const Orderlist = () => {
     const userDetails = JSON.parse(sessionStorage.getItem("userDetails"));
     try {
       await axios.put(`http://127.0.0.1:8000/api/Order/${idDonHang}/status`, {
-        employee_id: userDetails.id, // TRUYỀN ID NHÂN VIÊN VÀO BODY NÈ
+        employee_id: userDetails.id, 
         status: status,
       });
       setOrders((prevOrders) =>

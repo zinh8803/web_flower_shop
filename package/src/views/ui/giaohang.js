@@ -53,12 +53,12 @@ const Giaohang = () => {
             <CardBody>
               <Button
                 className="btn btn-info ms-5"
-                onClick={() => setActiveForm(activeForm === "addOrigin" ? "" : "addOrigin")}>
-                {activeForm === "addOrigin" ? "Đóng Form Chức vụ" : "Thêm Chức vụ"}
+                onClick={() => setActiveForm(activeForm === "addchucvu" ? "" : "addchucvu")}>
+                {activeForm === "addchucvu" ? "Đóng Form Chức vụ" : "Thêm Chức vụ"}
               </Button>
 
               <FormPositionUD />
-              {activeForm === "addOrigin" && <FormPosition />}
+              {activeForm === "addchucvu" && <FormPosition />}
             </CardBody>
           </Card>
 
@@ -72,12 +72,13 @@ const Giaohang = () => {
             <CardBody>
               <Button
                 className="btn btn-info ms-5"
-                onClick={() => setActiveForm(activeForm === "addOrigin" ? "" : "addOrigin")}>
-                {activeForm === "addOrigin" ? "Đóng Form Thêm lịch trình" : "Thêm lịch trình"}
-              </Button>
+                onClick={() => setActiveForm(activeForm === "addlichtrinh" ? "" : "addlichtrinh")}>
+                {activeForm === "addlichtrinh" ? "Đóng Form Thêm lịch trình" : "Thêm lịch trình"}
 
+              </Button>
+              {activeForm === "addlichtrinh" && <FormSchedule />}
               <Calendar />
-              {activeForm === "addOrigin" && <FormSchedule />}
+
             </CardBody>
           </Card>
         </CardBody>

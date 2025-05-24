@@ -7,12 +7,14 @@ import {
 } from "reactstrap";
 import FormOriginUD from "../forms/FormOriginUD";
 import FormCate from "../forms/FormCate";
+import Formloadthanhphan from "../forms/Formloadthanhphan.js";
 import Forms from "../forms/Forms";
 import FormSP from "../forms/FormSP";
 import FormAdd from "../forms/FormAdd";
 import ProductList from "../forms/test";
 import axios from "axios";
 import FormOrigin from "../forms/FormOrigin";
+import Formthanhphan from "../forms/formthanhphan";
 
 const ProductManagement = () => {
   const [cSelected, setCSelected] = useState("");
@@ -87,7 +89,26 @@ const ProductManagement = () => {
 
         </CardBody>
       </Card>
+      <Card>
+        <CardTitle tag="h6" className="border-bottom p-3 mb-0">
+          <i className="bi fs-3 bi-newspaper me-2"> </i>
+          <span className="fs-3"> Quản lý thành phần </span>
+        </CardTitle>
+        <CardBody>
+          <div className="mt-3">
+            <Button
+              className="btn btn-info"
+              onClick={() => setActiveForm(activeForm === "addCategory" ? "" : "addCategory")}>
+              {activeForm === "addCategory" ? "Đóng Form Thêm thành phần" : "Thêm thành phần"}
+            </Button>
 
+          </div>
+          {activeForm === "addCategory" && <Formthanhphan />}
+          <Formloadthanhphan />
+
+
+        </CardBody>
+      </Card>
 
       {/* <Card>
         <CardTitle tag="h6" className="border-bottom p-3 mb-0">

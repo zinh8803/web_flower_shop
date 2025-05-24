@@ -23,7 +23,7 @@ function ProductDetailPage() {
   const [error, setError] = useState("");
   const [categories, setCategories] = useState([]);
   const [origins, setOrigins] = useState([]);
-  const userData = JSON.parse(sessionStorage.getItem("user"));
+  const userData = (sessionStorage.getItem("token"));
   const isLoggedIn = !!userData;
 
   useEffect(() => {

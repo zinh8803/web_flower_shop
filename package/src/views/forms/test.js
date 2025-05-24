@@ -103,7 +103,7 @@ function ProductList() {
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-    setSnackbarMessage(`${product.tenSanPham} đã được thêm vào giỏ hàng!`);
+    setSnackbarMessage(`${product.name} đã được thêm vào giỏ hàng!`);
     setSnackbarOpen(true);
   };
 

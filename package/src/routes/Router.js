@@ -46,6 +46,7 @@ const CreatePayment = lazy(() => import("../views/ui/createPayment.js"));
 const PaymentCallbackVnpay = lazy(() => import("../views/ui/PaymentCallbackVnpay.js"));
 const ProductDetailPage = lazy(() => import("../views/forms/ProductDetail.js"));
 const AdminLogin = lazy(() => import("../views/FunctionUser/AdminLogin.js"));
+const ThanhphanManagement = lazy(() => import("../views/forms/formthanhphan.js"));
 const ThemeRoutes = [
   {
     path: "/",
@@ -120,7 +121,7 @@ const ThemeRoutes = [
       { path: "formOrigin", element: <FormOrigin /> },
       { path: "formOriginUD", element: <FormOriginUD /> },
       { path: "login", element: <AdminLogin /> },
-
+      
       { path: "chucvu", element: <FormPositionUD /> },
       { path: "themchucvu", element: <FormPosition /> },
       { path: "lichtrinh", element: <Calendar /> },

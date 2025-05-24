@@ -20,7 +20,6 @@ import {
   MenuItem,
   Avatar,
   Alert,
-
 } from "@mui/material";
 
 const ProductList = () => {
@@ -30,6 +29,7 @@ const ProductList = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [categories, setCategories] = useState([]);
   const [priceError, setPriceError] = useState("");
+
   const [inventoryError, setInventoryError] = useState("");
 
   useEffect(() => {
@@ -51,8 +51,6 @@ const ProductList = () => {
 
     fetchData();
   }, []);
-
-
 
   const getCategoryName = (id) => {
     const category = categories.find((category) => category.id === id);
@@ -86,24 +84,27 @@ const ProductList = () => {
   const handleEdit = (product) => {
     setEditingProduct(product);
     setOpenDialog(true);
+    setPriceError(""); // Reset errors when opening dialog
+    setInventoryError("");
   };
 
   const handleSave = () => {
     if (!editingProduct) return;
 
-    if (editingProduct.gia < 0) {
+    if (editingProduct.price < 0) {
       setPriceError("Giá không thể là số âm");
       return;
     } else {
       setPriceError("");
     }
 
-    if (editingProduct.tonKho < 0) {
-      setInventoryError("Số lượng không thể là số âm");
+    if (editingProduct.stock < 0) {
+      setInventoryError("Số lượng tồn kho không thể là số âm");
       return;
     } else {
       setInventoryError("");
     }
+
     const userDetails = JSON.parse(sessionStorage.getItem("userDetails"));
 
     const formData = new FormData();
@@ -130,7 +131,7 @@ const ProductList = () => {
         setProducts((prevProducts) =>
           prevProducts.map((p) =>
             p.id === editingProduct.id
-              ? { ...editingProduct, ImageFile: editingProduct.newImage || editingProduct.image_url }
+              ? { ...editingProduct, ImageFile: editingProduct.newImage || p.image_url }
               : p
           )
         );
@@ -145,9 +146,15 @@ const ProductList = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    let newValue = value;
+
+    if (name === "price" || name === "stock") {
+      newValue = Math.max(0, parseInt(value, 10)); // Ensure non-negative
+    }
+
     setEditingProduct((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: newValue,
     }));
   };
 
@@ -180,30 +187,42 @@ const ProductList = () => {
               <TableCell>Mô tả</TableCell>
               <TableCell>Giá</TableCell>
               <TableCell>Tồn kho</TableCell>
+              <TableCell>Thành phần</TableCell>
               <TableCell>Danh mục</TableCell>
               <TableCell>Hành động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {products.map((product) => (
-
               <TableRow key={product.id}>
-
                 <TableCell>{product.id}</TableCell>
                 <TableCell>
-                  {console.log('Product Image:', product.ImageFile)} {/* Log đường dẫn ảnh */}
+                  {console.log('Product Image:', product.image_url)} {/* Log đường dẫn ảnh */}
                   <Avatar
                     src={product.image_url}
                     alt={product.name}
                     variant="square"
                     sx={{ width: 80, height: 80 }}
                   />
-
                 </TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>{product.description}</TableCell>
-                <TableCell>{product.price.toLocaleString()} VND</TableCell>
+                <TableCell>{product.price?.toLocaleString()} VND</TableCell>
                 <TableCell>{product.stock}</TableCell>
+                <TableCell>
+                  {product.ingredients && product.ingredients.length > 0 ? (
+                    <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                      {product.ingredients.map((ingredient) => (
+                        <li key={ingredient.id}>
+                          {ingredient.description || 'Không có mô tả'}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    'Không có thành phần'
+                  )}
+                </TableCell>
+                {console.log('Product :', product.ingredients.description)} {/* Log đường dẫn ảnh */}
                 <TableCell>{getCategoryName(product.category_id)}</TableCell>
                 <TableCell>
                   <Button
@@ -284,7 +303,6 @@ const ProductList = () => {
               </MenuItem>
             ))}
           </Select>
-
 
           <Button
             variant="contained"

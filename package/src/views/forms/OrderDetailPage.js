@@ -22,9 +22,9 @@ const OrderDetailPage = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:7000/api/DonHang/Chitiet?Iddonhang=${idDonHang}`)
+      .get(`http://127.0.0.1:8000/api/Order/detail=${idDonHang}`)
       .then((response) => {
-        setOrderDetails(response.data || []);
+        setOrderDetails(response.data.data || []);
         setLoading(false);
       })
       .catch((err) => {
@@ -33,11 +33,7 @@ const OrderDetailPage = () => {
       });
   }, [idDonHang]);
 
-  const getImageUrl = (url) => {
-    if (!url) return "";
-    const imagePath = url.split("WebRootPath\\")[1];
-    return `http://localhost:7000/${imagePath}`;
-  };
+
 
   if (loading) return <CircularProgress sx={{ display: "block", mx: "auto", mt: 5 }} />;
   if (error) return <Alert severity="error">{error}</Alert>;
@@ -57,24 +53,24 @@ const OrderDetailPage = () => {
               <Card sx={{ display: "flex", mb: 2, p: 2 }}>
                 <CardMedia
                   component="img"
-                  image={getImageUrl(item.hangHoa?.hinhAnh)}
+                  image={(item.product?.image_url)}
                   alt={item.hangHoa?.tenSanPham}
                   sx={{ width: 120, height: 120, objectFit: "cover", borderRadius: 2, mr: 2 }}
                 />
                 <CardContent sx={{ flex: 1 }}>
                   <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    {item.hangHoa?.tenSanPham}
+                    {item.product?.name}
                   </Typography>
                   <Typography>
-                    <strong>Giá:</strong> {item.hangHoa?.gia.toLocaleString()} VND
+                    <strong>Giá:</strong> {item.product?.final_price} VND
                   </Typography>
-                  <Typography>
+                  {/* <Typography>
                     <strong>Số lượng:</strong> {item.soLuong}
                   </Typography>
                   <Typography>
                     <strong>Tổng:</strong>{" "}
                     {(item.hangHoa?.gia * item.soLuong).toLocaleString()} VND
-                  </Typography>
+                  </Typography> */}
                 </CardContent>
               </Card>
             </Grid>

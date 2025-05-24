@@ -18,7 +18,7 @@ const navigation = [
   {
     title: "Quản lý đơn hàng",
     href: "OrderManagement",
-    icon: "bi bi-newspaper",
+    icon: "bi bi-cart-fill",
   },
   {
     title: "Quản lý nhân viên ",
@@ -28,12 +28,12 @@ const navigation = [
   {
     title: "chức vụ lịch trình",
     href: "chucvu&lichtrinh",
-    icon: "bi  bi-person-fill",
+    icon: "bi bi-calendar-event-fill",
   },
   {
     title: "Đăng xuất ",
     href: "logout",
-    icon: "bi  bi-person-fill",
+    icon: "bi bi-box-arrow-left",
   },
 
 ];

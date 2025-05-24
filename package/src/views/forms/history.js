@@ -17,13 +17,20 @@ const OrderHistoryPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
-    const userData = JSON.parse(sessionStorage.getItem("user"));
+    const userData = (sessionStorage.getItem("token"));
 
-    if (userData && userData.id) {
+    if (userData) {
       axios
-        .get(`http://localhost:7000/api/DonHang/User/${userData.id}`)
+        .get(`http://127.0.0.1:8000/api/Order/User`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userData}`,
+            },
+          }
+        )
         .then((response) => {
-          setOrderDetails(response.data || []);
+          setOrderDetails(response.data.data || []);
           setLoading(false);
         })
         .catch((err) => {
@@ -54,29 +61,29 @@ const OrderHistoryPage = () => {
             <Grid item xs={12} key={index}>
               <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                  Đơn hàng #{detail.donHangId}
+                  Đơn hàng #{detail.id}
                 </Typography>
                 <Typography>
-                  <strong>Tên sản phẩm:</strong> {detail.tenHangHoa}
+                  <strong>Tên sản phẩm:</strong> {detail.name}
+                </Typography>
+                {/* <Typography>
+                  <strong>Số lượng:</strong> {detail.stock}
+                </Typography> */}
+                <Typography>
+                  <strong>Đơn giá:</strong> {detail.total_price} VND
                 </Typography>
                 <Typography>
-                  <strong>Số lượng:</strong> {detail.soLuong}
-                </Typography>
-                <Typography>
-                  <strong>Đơn giá:</strong> {detail.donGia.toLocaleString()} VND
-                </Typography>
-                <Typography>
-                  <strong>Trạng thái:</strong> {detail.trangThaiDonHang}
+                  <strong>Trạng thái:</strong> {detail.status}
                 </Typography>
                 <Box sx={{ textAlign: "right", mt: 2 }}>
-                <Button
-  variant="outlined"
-  color="primary"
-  onClick={() => navigate(`/orderhistory/${detail.donHangId}`)}
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => navigate(`/orderhistory/${detail.id}`)}
 
->
-  Chi Tiết
-</Button>
+                  >
+                    Chi Tiết
+                  </Button>
                 </Box>
                 <Divider sx={{ my: 2 }} />
               </Paper>

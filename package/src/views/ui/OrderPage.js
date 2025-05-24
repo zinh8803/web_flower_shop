@@ -203,11 +203,11 @@ const OrderPage = () => {
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
           >
-            {/* <FormControlLabel
+            <FormControlLabel
               value="momo"
               control={<Radio />}
               label="Thanh toán qua MoMo"
-            /> */}
+            />
             <FormControlLabel
               value="vnpay"
               control={<Radio />}

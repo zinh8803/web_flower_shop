@@ -33,9 +33,7 @@ const CartPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Hàm lấy URL hình ảnh
 
-  // Fetch danh sách sản phẩm
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/products")
@@ -49,12 +47,10 @@ const CartPage = () => {
       });
   }, []);
 
-  // Tính toán tổng tiền
   const total = cart.reduce((total, item) => total + item.final_price * item.quantity, 0);
   const vat = total * 0.08;
   const totalWithVAT = total + vat;
 
-  // Hàm cập nhật số lượng sản phẩm
   const updateQuantity = (id, newQuantity, tonKho) => {
     if (isNaN(newQuantity) || newQuantity < 1) newQuantity = 1;
     if (newQuantity > tonKho) return;
@@ -67,27 +63,23 @@ const CartPage = () => {
   };
 
 
-  // Hàm xóa sản phẩm khỏi giỏ hàng
   const removeFromCart = (idSanPham) => {
     const updatedCart = cart.filter((item) => item.id !== idSanPham);
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // Hàm xử lý đặt hàng
   const handlePlaceOrder = () => {
     localStorage.setItem("orderDetails", JSON.stringify({ cart, vat, totalWithVAT }));
     navigate("/cartpage/orderpage");
   };
 
-  // Xử lý khi loading hoặc lỗi
   if (loading) return <Typography>Loading...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Grid container spacing={4}>
-        {/* Danh sách sản phẩm trong giỏ hàng */}
         <Grid item xs={12} md={8}>
           {cart.map((item) => {
             const product = products.find((p) => p.id === item.id);
